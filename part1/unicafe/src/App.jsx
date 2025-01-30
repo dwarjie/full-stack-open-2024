@@ -26,7 +26,11 @@ function App() {
       <Button title={"neutral"} handleClick={handleNeutral} />
       <Button title={"bad"} handleClick={handleBad} />
       <h1>statistics</h1>
-      <Statistics good={good} neutral={neutral} bad={bad} />
+      {(good || neutral || bad) ? (
+        <Statistics good={good} neutral={neutral} bad={bad} />
+      ) : (
+        <p>No feedback given</p>
+      )}
     </div>
   );
 }
