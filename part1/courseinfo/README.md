@@ -1,1 +1,1 @@
-# Part1 - courseinfo Exercise
+# Part1 - Courseinfo
