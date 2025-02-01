@@ -1,7 +1,7 @@
 const Header = ({ title }) => {
   return (
     <>
-      <h1>{title}</h1>
+      <h1 style={{fontWeight: "bold"}}>{title}</h1>
     </>
   )
 }
