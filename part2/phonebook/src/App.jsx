@@ -1,4 +1,7 @@
 import { useState } from "react";
+import Filter from "./components/Filter";
+import PersonForm from "./components/PersonForm";
+import Persons from "./components/Persons";
 
 const App = () => {
   const personInitialValue = [
@@ -52,49 +55,14 @@ const App = () => {
     return existingName;
   };
 
-  const renderNumbers = () => {
-    if (!search) {
-      return persons.map((person) => (
-        <p key={person.name}>
-          {person.name} {person.number}
-        </p>
-      ));
-    }
-
-    return persons
-      .filter((person) =>
-        person.name.toLowerCase().includes(search.toLowerCase()),
-      )
-      .map((person) => (
-        <p key={person.name}>
-          {person.name} {person.number}
-        </p>
-      ))
-  };
-
   return (
     <div>
       <h2 style={{ fontWeight: "bold" }}>Phonebook</h2>
-      <div>
-        filter to shown with a
-        <input value={search} onChange={handleSearch} />
-      </div>
+      <Filter search={search} handleSearch={handleSearch}/>
       <h2 style={{ fontWeight: "bold" }}>add new</h2>
-      <form onSubmit={addNote}>
-        <div>
-          name:
-          <input value={newName} onChange={handleNewName} />
-        </div>
-        <div>
-          number:
-          <input value={newNumber} onChange={handleNewNumber} />
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
+      <PersonForm newName={newName} newNumber={newNumber} handleNewName={handleNewName} handleNewNumber={handleNewNumber} addNote={addNote}/>
       <h2 style={{ fontWeight: "bold" }}>Numbers</h2>
-      {renderNumbers()}
+      <Persons persons={persons} search={search}/>
     </div>
   );
 };
