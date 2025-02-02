@@ -3,12 +3,17 @@ import phonebookService from "./services/phonebook";
 import Filter from "./components/Filter";
 import PersonForm from "./components/PersonForm";
 import PersonsList from "./components/PersonsList"; 
+import "./index.css"
+import Notification from "./components/Notification";
 
 const App = () => {
+  const NOTIFICATION_TIMER = 2000 // milliseconds
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [search, setSearch] = useState("");
+  const [notificationMessage, setNotificationMessage] = useState(null)
+  const [isError, setIsError] = useState(false)
 
   useEffect(() => {
     phonebookService.
@@ -17,7 +22,9 @@ const App = () => {
         setPersons(data)
       })
       .catch(err => {
-        alert(`Error fetching all phonebook list. Please try again later`);
+        startNotifTimer()
+        setNotificationMessage(err)
+        setIsError(true)
       })
   }, [])
 
@@ -30,7 +37,9 @@ const App = () => {
         setPersons(persons.filter(person => person.id !== data.id))
       })
       .catch(err => {
-        alert(`Error deleting record. Please try again later`)
+        startNotifTimer()
+        setNotificationMessage(err)
+        setIsError(true)
       })
   }
 
@@ -45,12 +54,16 @@ const App = () => {
     phonebookService
       .create(personObj)
       .then(() => {
+        startNotifTimer()
+        setNotificationMessage(`Added: ${personObj.name}`)
         setPersons(persons.concat(personObj));
         setNewName("");
         setNewNumber("");
       })
       .catch(err => {
-        alert(`Error creating ${personObj.name} record. Please try again later.`)
+        startNotifTimer()
+        setNotificationMessage(err)
+        setIsError(true)
       })
   };
 
@@ -61,9 +74,16 @@ const App = () => {
     phonebookService
       .update(existingRecord.id, updatedRecord)
       .then(data => {
+        startNotifTimer()
+        setNotificationMessage(`Updated: ${existingRecord.name}`)
         setPersons(persons.map(person => person.id === existingRecord.id ? data : person))
         setNewName("");
         setNewNumber("");
+      })
+      .catch(err => {
+        startNotifTimer()
+        setNotificationMessage(err)
+        setIsError(true)
       })
   }
 
@@ -79,6 +99,13 @@ const App = () => {
 
     return existingName;
   };
+
+  const startNotifTimer = () => {
+    setTimeout(() => {
+      setNotificationMessage(null)
+      setIsError(false)
+    }, NOTIFICATION_TIMER)
+  }
 
   const handleNewName = (event) => {
     setNewName(event.target.value);
@@ -96,6 +123,7 @@ const App = () => {
   return (
     <div>
       <h2 style={{ fontWeight: "bold" }}>Phonebook</h2>
+      <Notification message={notificationMessage} error={isError}/>
       <Filter search={search} handleSearch={handleSearch}/>
       <h2 style={{ fontWeight: "bold" }}>add new</h2>
       <PersonForm newName={newName} newNumber={newNumber} handleNewName={handleNewName} handleNewNumber={handleNewNumber} addNote={addNote}/>
