@@ -1,10 +1,10 @@
-const Persons = ({ search, persons}) => {
+import Person from "./Person";
+
+const PersonsList = ({ search, persons, handleDelete }) => {
   const renderNumbers = () => {
     if (!search) {
       return persons.map((person) => (
-        <p key={person.name}>
-          {person.name} {person.number}
-        </p>
+        <Person person={person} key={person.name} handleDelete={handleDelete}/>
       ));
     }
 
@@ -13,9 +13,7 @@ const Persons = ({ search, persons}) => {
         person.name.toLowerCase().includes(search.toLowerCase()),
       )
       .map((person) => (
-        <p key={person.name}>
-          {person.name} {person.number}
-        </p>
+        <Person person={person} key={person.name} handleDelete={handleDelete}/>
       ))
   };
 
@@ -26,4 +24,4 @@ const Persons = ({ search, persons}) => {
   )
 }
 
-export default Persons;
+export default PersonsList;

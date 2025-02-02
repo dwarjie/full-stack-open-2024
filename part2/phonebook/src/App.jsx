@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import phonebookService from "./services/phonebook"; 
 import Filter from "./components/Filter";
 import PersonForm from "./components/PersonForm";
-import Persons from "./components/Persons";
+import PersonsList from "./components/PersonsList"; 
 
 const App = () => {
   const [persons, setPersons] = useState([]);
@@ -11,42 +11,61 @@ const App = () => {
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    axios
-      .get("http://localhost:3001/persons")
-      .then(response => {
-        console.log(response)
-        setPersons(response.data)
+    phonebookService.
+      getAll()
+      .then(data => {
+        setPersons(data)
       })
       .catch(err => {
-        console.log("Error fetching data: ${err}")
+        alert(`Error fetching all phonebook list. Please try again later`);
       })
   }, [])
 
-  const handleNewName = (event) => {
-    setNewName(event.target.value);
-  };
+  const deleteRecord = (person) => {
+    if (!window.confirm(`Are you sure you want to delete ${person.name}?`)) return
 
-  const handleNewNumber = (event) => {
-    setNewNumber(event.target.value);
-  };
-
-  const handleSearch = (event) => {
-    setSearch(event.target.value);
-  };
+    phonebookService
+      .deleteNumber(person.id)
+      .then(data => {
+        setPersons(persons.filter(person => person.id !== data.id))
+      })
+      .catch(err => {
+        alert(`Error deleting record. Please try again later`)
+      })
+  }
 
   const addNote = (event) => {
     event.preventDefault();
-    if (checkDuplicate()) {
-      setNewName("");
-      setNewNumber("");
-      return alert(`${newName} is already added to phonebook.`);
+    const existingRecord = checkDuplicate()
+    if (existingRecord) {
+      return updateNumber(existingRecord)
     }
 
     const personObj = prepareNoteValues();
-    setPersons(persons.concat(personObj));
-    setNewName("");
-    setNewNumber("");
+    phonebookService
+      .create(personObj)
+      .then(() => {
+        setPersons(persons.concat(personObj));
+        setNewName("");
+        setNewNumber("");
+      })
+      .catch(err => {
+        alert(`Error creating ${personObj.name} record. Please try again later.`)
+      })
   };
+
+  const updateNumber = (existingRecord) => {
+    if (!window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) return;
+
+    const updatedRecord = {...existingRecord, number: newNumber}
+    phonebookService
+      .update(existingRecord.id, updatedRecord)
+      .then(data => {
+        setPersons(persons.map(person => person.id === existingRecord.id ? data : person))
+        setNewName("");
+        setNewNumber("");
+      })
+  }
 
   const prepareNoteValues = () => {
     return {
@@ -61,6 +80,19 @@ const App = () => {
     return existingName;
   };
 
+  const handleNewName = (event) => {
+    setNewName(event.target.value);
+  };
+
+  const handleNewNumber = (event) => {
+    setNewNumber(event.target.value);
+  };
+
+  const handleSearch = (event) => {
+    setSearch(event.target.value);
+  };
+
+
   return (
     <div>
       <h2 style={{ fontWeight: "bold" }}>Phonebook</h2>
@@ -68,7 +100,7 @@ const App = () => {
       <h2 style={{ fontWeight: "bold" }}>add new</h2>
       <PersonForm newName={newName} newNumber={newNumber} handleNewName={handleNewName} handleNewNumber={handleNewNumber} addNote={addNote}/>
       <h2 style={{ fontWeight: "bold" }}>Numbers</h2>
-      <Persons persons={persons} search={search}/>
+      <PersonsList persons={persons} search={search} handleDelete={deleteRecord}/>
     </div>
   );
 };
