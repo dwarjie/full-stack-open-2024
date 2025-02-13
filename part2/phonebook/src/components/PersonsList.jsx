@@ -4,7 +4,7 @@ const PersonsList = ({ search, persons, handleDelete }) => {
   const renderNumbers = () => {
     if (!search) {
       return persons.map((person) => (
-        <Person person={person} key={person.name} handleDelete={handleDelete}/>
+        <Person person={person} key={person.name} handleDelete={() => handleDelete(person)}/>
       ));
     }
 
@@ -13,7 +13,7 @@ const PersonsList = ({ search, persons, handleDelete }) => {
         person.name.toLowerCase().includes(search.toLowerCase()),
       )
       .map((person) => (
-        <Person person={person} key={person.name} handleDelete={handleDelete}/>
+        <Person person={person} key={person.name} handleDelete={() => handleDelete(person)}/>
       ))
   };
 

@@ -34,6 +34,8 @@ const App = () => {
     phonebookService
       .deleteNumber(person.id)
       .then(data => {
+        startNotifTimer()
+        setNotificationMessage(`Deleted: ${person.name}`)
         setPersons(persons.filter(person => person.id !== data.id))
       })
       .catch(err => {
