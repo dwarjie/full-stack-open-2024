@@ -1,5 +1,5 @@
 import axios from "axios";
-const baseUrl = "http://localhost:3001/api/persons";
+const baseUrl = "https://phonebook-backend-8qlw.onrender.com/api/persons";
 
 const getAll = () => {
   const request = axios.get(baseUrl);
@@ -15,7 +15,7 @@ const create = (newData) => {
   return request
     .then((response) => response.data)
     .catch((err) => {
-      throw `Error creating record. Please try again later.`;
+      throw `Error creating record. ${err.response.data.error}`;
     });
 };
 
